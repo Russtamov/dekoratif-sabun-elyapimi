@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://yourwebsite.com/</loc>
+    <lastmod>2024-12-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://yourwebsite.com/logo_cicek.jpeg</image:loc>
+      <image:title>Dekoratif Kokulu Sabunlar Logo</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yourwebsite.com/cicek1.jpeg</image:loc>
+      <image:title>Lavanta Kokulu Dekoratif Sabun</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yourwebsite.com/cicek2.jpeg</image:loc>
+      <image:title>Gül Kokulu Dekoratif Sabun</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yourwebsite.com/cicek3.jpeg</image:loc>
+      <image:title>Limon Kokulu Dekoratif Sabun</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yourwebsite.com/cicek4.jpeg</image:loc>
+      <image:title>Nane Kokulu Dekoratif Sabun</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yourwebsite.com/cicek5.jpeg</image:loc>
+      <image:title>Vanilya Kokulu Dekoratif Sabun</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://yourwebsite.com/cicek6.jpeg</image:loc>
+      <image:title>Karanfil Kokulu Dekoratif Sabun</image:title>
+    </image:image>
+  </url>
+  
+</urlset>
