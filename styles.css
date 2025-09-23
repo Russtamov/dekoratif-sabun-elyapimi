@@ -113,13 +113,28 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all var(--transition-smooth);
   padding: 1rem 0;
+
+  /* Enhanced smooth transitions */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Hardware acceleration for smooth scrolling */
+  will-change: background-color, box-shadow, backdrop-filter;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .header.scrolled {
   background: rgba(255, 255, 255, 0.98);
   box-shadow: var(--shadow-md);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+
+  /* Smooth height transition */
+  padding: 0.75rem 0;
 }
 
 .header .container {
@@ -152,10 +167,10 @@ body {
 @keyframes logoFloat {
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0px) translateZ(0);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-5px) translateZ(0);
   }
 }
 
@@ -224,6 +239,17 @@ body {
     rgba(255, 255, 255, 0.8) 100%
   );
   overflow: hidden;
+
+  /* Enhanced smooth scroll performance */
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+
+  /* Smooth transitions for scroll effects */
+  transition: transform 0.1s linear;
+  -webkit-transition: transform 0.1s linear;
 }
 
 .hero::before {
@@ -236,14 +262,21 @@ body {
   background: url("./cicek8.jpeg") center/cover;
   z-index: -2;
   animation: kenBurns 20s ease-in-out infinite alternate;
+
+  /* Enhanced background performance */
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 @keyframes kenBurns {
   0% {
-    transform: scale(1) rotate(0deg);
+    transform: scale(1) rotate(0deg) translateZ(0);
   }
   100% {
-    transform: scale(1.1) rotate(2deg);
+    transform: scale(1.05) rotate(1deg) translateZ(0);
   }
 }
 
@@ -1021,6 +1054,28 @@ body {
     transition: opacity 0.3s ease;
   }
 
+  /* Enhanced mobile header smoothness */
+  .header {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Reduce animation intensity on mobile for smoother performance */
+  .hero {
+    transition: transform 0.08s linear;
+    -webkit-transition: transform 0.08s linear;
+  }
+
+  /* Lighter animations on mobile */
+  @keyframes kenBurns {
+    0% {
+      transform: scale(1) translateZ(0);
+    }
+    100% {
+      transform: scale(1.02) translateZ(0);
+    }
+  }
+
   .product-card:hover {
     transform: none; /* Disable hover transforms on mobile */
   }
@@ -1671,7 +1726,8 @@ body {
   text-align: center;
   box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
   z-index: 1000;
-  animation: whatsappFloat 3s ease-in-out infinite;
+  animation: whatsappFloat 3s ease-in-out infinite,
+    whatsappPulse 4s ease-in-out infinite;
   transition: all var(--transition-smooth);
   cursor: pointer;
   border: none;
@@ -1679,6 +1735,17 @@ body {
   align-items: center;
   justify-content: center;
   text-decoration: none;
+
+  /* Enhanced scroll performance */
+  will-change: transform;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+
+  /* Always stay on top during scroll */
+  position: fixed !important;
+  pointer-events: auto;
 }
 
 .whatsapp-float:hover {
@@ -1693,12 +1760,31 @@ body {
 }
 
 @keyframes whatsappFloat {
-  0%,
-  100% {
-    transform: translateY(0px);
+  0% {
+    transform: translateY(0px) translateZ(0);
+  }
+  25% {
+    transform: translateY(-5px) translateZ(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-10px) translateZ(0);
+  }
+  75% {
+    transform: translateY(-5px) translateZ(0);
+  }
+  100% {
+    transform: translateY(0px) translateZ(0);
+  }
+}
+
+/* Enhanced smooth floating animation for better visibility */
+@keyframes whatsappPulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 25px rgba(37, 211, 102, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 35px rgba(37, 211, 102, 0.5);
   }
 }
 
@@ -1750,6 +1836,13 @@ body {
     height: 55px;
     bottom: 20px;
     right: 20px;
+
+    /* Mobile scroll optimization */
+    position: fixed !important;
+    z-index: 9999;
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
   }
 
   .whatsapp-float i {
@@ -1767,6 +1860,14 @@ body {
     height: 50px;
     bottom: 15px;
     right: 15px;
+
+    /* Extra mobile optimization */
+    position: fixed !important;
+    z-index: 9999;
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-overflow-scrolling: touch;
   }
 
   .whatsapp-float i {

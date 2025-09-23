@@ -27,8 +27,10 @@ class DekoratifCicekSite {
     this.currentTestimonial = 0;
     this.testimonialInterval = null;
 
-    // Performance optimizations
-    this.scrollThrottle = this.throttle(this.handleScroll.bind(this), 16);
+    // Performance optimizations with smoother scroll handling
+    this.scrollThrottle = this.throttle(this.handleScroll.bind(this), 8);
+    this.lastScrollTop = 0;
+    this.scrollDirection = "down";
     this.resizeThrottle = this.throttle(this.handleResize.bind(this), 250);
 
     // Initialize mobile menu state
@@ -50,6 +52,9 @@ class DekoratifCicekSite {
 
     // Enhanced image loading for mobile
     this.setupImageLoading();
+
+    // Optimize WhatsApp button for mobile scroll
+    this.optimizeWhatsAppButton();
 
     // Navigation events
     this.navToggle?.addEventListener("click", this.toggleMobileMenu.bind(this));
@@ -92,18 +97,33 @@ class DekoratifCicekSite {
   handleScroll() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-    // Header background effect
-    if (scrollTop > 100) {
-      this.header?.classList.add("scrolled");
-    } else {
-      this.header?.classList.remove("scrolled");
-    }
+    // Determine scroll direction for smoother animations
+    this.scrollDirection = scrollTop > this.lastScrollTop ? "down" : "up";
+    this.lastScrollTop = scrollTop;
 
-    // Parallax effect for hero section
+    // Enhanced header background effect with smooth transition zones
+    if (!this.header) return;
+
+    // Use requestAnimationFrame for smoother transitions
+    requestAnimationFrame(() => {
+      if (scrollTop > 50) {
+        if (!this.header.classList.contains("scrolled")) {
+          this.header.classList.add("scrolled");
+        }
+      } else {
+        if (this.header.classList.contains("scrolled")) {
+          this.header.classList.remove("scrolled");
+        }
+      }
+    });
+
+    // Optimized parallax effect for hero section
     const heroSection = document.querySelector(".hero");
-    if (heroSection) {
-      const scrolled = scrollTop * 0.5;
-      heroSection.style.transform = `translateY(${scrolled}px)`;
+    if (heroSection && scrollTop < window.innerHeight) {
+      requestAnimationFrame(() => {
+        const scrolled = scrollTop * 0.3; // Reduced parallax intensity for smoother effect
+        heroSection.style.transform = `translate3d(0, ${scrolled}px, 0)`;
+      });
     }
   }
 
@@ -506,6 +526,50 @@ class DekoratifCicekSite {
         img.style.opacity = "1";
       }
     });
+  }
+
+  optimizeWhatsAppButton() {
+    const whatsappButton = document.querySelector(".whatsapp-float");
+    if (!whatsappButton) return;
+
+    // Ensure WhatsApp button stays visible during scroll
+    let scrollTimeout;
+
+    const handleScroll = () => {
+      // Add a subtle emphasis during scroll
+      whatsappButton.style.transform = "scale(1.02)";
+
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        whatsappButton.style.transform = "";
+      }, 150);
+    };
+
+    // Listen to scroll events for WhatsApp button visibility
+    window.addEventListener("scroll", this.throttle(handleScroll, 16), {
+      passive: true,
+    });
+
+    // Ensure the button is always clickable
+    whatsappButton.style.pointerEvents = "auto";
+    whatsappButton.style.touchAction = "manipulation";
+
+    // Add accessibility for better mobile interaction
+    whatsappButton.addEventListener(
+      "touchstart",
+      (e) => {
+        e.currentTarget.style.transform = "scale(0.95)";
+      },
+      { passive: true }
+    );
+
+    whatsappButton.addEventListener(
+      "touchend",
+      (e) => {
+        e.currentTarget.style.transform = "";
+      },
+      { passive: true }
+    );
   }
 
   trackEvent(eventName, data = {}) {
