@@ -38,9 +38,18 @@ class DekoratifCicekSite {
   }
 
   bindEvents() {
-    // Scroll events
+    // Scroll events with mobile optimization
     window.addEventListener("scroll", this.scrollThrottle, { passive: true });
     window.addEventListener("resize", this.resizeThrottle, { passive: true });
+
+    // Mobile-specific touch event optimizations
+    if ("ontouchstart" in window) {
+      document.body.addEventListener("touchstart", () => {}, { passive: true });
+      document.body.addEventListener("touchmove", () => {}, { passive: true });
+    }
+
+    // Enhanced image loading for mobile
+    this.setupImageLoading();
 
     // Navigation events
     this.navToggle?.addEventListener("click", this.toggleMobileMenu.bind(this));
@@ -376,40 +385,127 @@ class DekoratifCicekSite {
   }
 
   initIntersectionObserver() {
-    // Observe elements for scroll animations
+    // Mobile-optimized intersection observer
+    const isMobile = window.innerWidth <= 768;
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            // Add smooth transition for better performance
+            entry.target.style.willChange = "opacity, transform";
             entry.target.style.opacity = "1";
             entry.target.style.transform = "translateY(0)";
-            observer.unobserve(entry.target);
+
+            // Clean up will-change after animation
+            setTimeout(() => {
+              entry.target.style.willChange = "auto";
+            }, 600);
+
+            // Don't unobserve on mobile for bi-directional scrolling
+            if (!isMobile) {
+              observer.unobserve(entry.target);
+            }
+          } else if (isMobile && entry.boundingClientRect.bottom < 0) {
+            // Re-hide elements that scroll out of view on mobile (upward scroll)
+            entry.target.style.opacity = "0.3";
+            entry.target.style.transform = "translateY(20px)";
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      {
+        threshold: isMobile ? 0.05 : 0.1,
+        rootMargin: isMobile ? "50px 0px 50px 0px" : "0px 0px -50px 0px",
+      }
+    );
+
+    // Enhanced image lazy loading with Intersection Observer
+    const imageObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+              img.removeAttribute("data-src");
+            }
+            img.style.opacity = "1";
+            imageObserver.unobserve(img);
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: "100px 0px 100px 0px", // Preload images earlier
+      }
     );
 
     // Observe all animated elements
     document
-      .querySelectorAll(".product-card, .feature, .about-text, .contact-info")
+      .querySelectorAll(".product-card, .feature, .about-text")
       .forEach((el) => {
         observer.observe(el);
       });
+
+    // Observe all lazy-loaded images
+    document.querySelectorAll("img[loading='lazy']").forEach((img) => {
+      imageObserver.observe(img);
+    });
   }
 
-  // Utility functions
+  // Utility functions with mobile optimization
   throttle(func, limit) {
     let inThrottle;
+    const isMobile = window.innerWidth <= 768;
+    const adjustedLimit = isMobile ? Math.max(limit, 32) : limit; // Slower throttle on mobile
+
     return function () {
       const args = arguments;
       const context = this;
       if (!inThrottle) {
         func.apply(context, args);
         inThrottle = true;
-        setTimeout(() => (inThrottle = false), limit);
+        setTimeout(() => (inThrottle = false), adjustedLimit);
       }
     };
+  }
+
+  // Mobile-specific debounce for expensive operations
+  debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  setupImageLoading() {
+    // Enhanced image loading for mobile devices
+    document.querySelectorAll('img[loading="lazy"]').forEach((img) => {
+      img.onload = () => {
+        img.classList.add("loaded");
+        img.style.opacity = "1";
+      };
+
+      img.onerror = () => {
+        console.warn("Image failed to load:", img.src);
+        img.style.opacity = "0.5";
+        // Try to reload the image once
+        setTimeout(() => {
+          img.src = img.src;
+        }, 1000);
+      };
+
+      // Force immediate loading if image is in viewport on page load
+      const rect = img.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        img.style.opacity = "1";
+      }
+    });
   }
 
   trackEvent(eventName, data = {}) {
