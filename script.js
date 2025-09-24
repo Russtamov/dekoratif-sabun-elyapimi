@@ -532,16 +532,62 @@ class DekoratifCicekSite {
     const whatsappButton = document.querySelector(".whatsapp-float");
     if (!whatsappButton) return;
 
-    // Ensure WhatsApp button stays visible during scroll
-    let scrollTimeout;
+    // Force WhatsApp button to always stay visible and positioned
+    const ensureButtonVisibility = () => {
+      whatsappButton.style.position = "fixed";
+      whatsappButton.style.right =
+        window.innerWidth <= 480
+          ? "15px"
+          : window.innerWidth <= 768
+          ? "20px"
+          : "30px";
+      whatsappButton.style.bottom =
+        window.innerWidth <= 480
+          ? "15px"
+          : window.innerWidth <= 768
+          ? "20px"
+          : "30px";
+      whatsappButton.style.left = "auto";
+      whatsappButton.style.top = "auto";
+      whatsappButton.style.visibility = "visible";
+      whatsappButton.style.display = "flex";
+      whatsappButton.style.opacity = "1";
+      whatsappButton.style.zIndex = "2147483647";
+      whatsappButton.style.pointerEvents = "auto";
+      whatsappButton.style.margin = "0";
+      whatsappButton.style.transform =
+        whatsappButton.style.transform || "translateZ(0)";
+    };
 
+    // Ensure button visibility on load and during scroll
+    ensureButtonVisibility();
+
+    // Force position fixed immediately
+    setTimeout(() => {
+      ensureButtonVisibility();
+      console.log("WhatsApp button forced to fixed position");
+    }, 100);
+
+    // Additional safety check
+    setInterval(() => {
+      if (whatsappButton.style.position !== "fixed") {
+        ensureButtonVisibility();
+        console.log("WhatsApp button position corrected");
+      }
+    }, 1000);
+
+    // Enhanced scroll handling for WhatsApp button
+    let scrollTimeout;
     const handleScroll = () => {
+      // Ensure visibility during scroll
+      ensureButtonVisibility();
+
       // Add a subtle emphasis during scroll
-      whatsappButton.style.transform = "scale(1.02)";
+      whatsappButton.style.transform = "scale(1.02) translateZ(0)";
 
       clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(() => {
-        whatsappButton.style.transform = "";
+        whatsappButton.style.transform = "translateZ(0)";
       }, 150);
     };
 
@@ -550,7 +596,7 @@ class DekoratifCicekSite {
       passive: true,
     });
 
-    // Ensure the button is always clickable
+    // Ensure the button is always clickable and properly positioned
     whatsappButton.style.pointerEvents = "auto";
     whatsappButton.style.touchAction = "manipulation";
 
@@ -558,7 +604,8 @@ class DekoratifCicekSite {
     whatsappButton.addEventListener(
       "touchstart",
       (e) => {
-        e.currentTarget.style.transform = "scale(0.95)";
+        ensureButtonVisibility();
+        e.currentTarget.style.transform = "scale(0.95) translateZ(0)";
       },
       { passive: true }
     );
@@ -566,10 +613,31 @@ class DekoratifCicekSite {
     whatsappButton.addEventListener(
       "touchend",
       (e) => {
-        e.currentTarget.style.transform = "";
+        ensureButtonVisibility();
+        e.currentTarget.style.transform = "translateZ(0)";
       },
       { passive: true }
     );
+
+    // Monitor for any DOM changes that might affect button visibility
+    const observer = new MutationObserver(() => {
+      ensureButtonVisibility();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["style", "class"],
+    });
+
+    // Ensure visibility on window resize and orientation change
+    window.addEventListener("resize", ensureButtonVisibility, {
+      passive: true,
+    });
+    window.addEventListener("orientationchange", ensureButtonVisibility, {
+      passive: true,
+    });
   }
 
   trackEvent(eventName, data = {}) {
